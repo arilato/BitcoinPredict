@@ -2,14 +2,16 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-days_in_month = [0, 23, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30]
+days_in_month = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30]
 
-def dateToHours(date): #start reference from 2016-12-08
+def dateToHours(date): #start reference from 2015-12-11
     year = int(date[0:4])
     month = int(date[5:7])
     day = int(date[8:10])
     hour = int(date[11:13])
-    if year == 2016: month -= 12
+    if year == 2015: month -= 12
+    if year == 2017: month += 12
+    
     tot_days = day + sum(days_in_month[0:month+1]) - 8
     return hour + tot_days * 24
 
@@ -20,7 +22,7 @@ def stackToX(file, X):
         tmp[i][0] = dateToHours(tmp[i][0])
     toadd = []
     for i in range(len(tmp)):
-        if len(toadd) == 365:
+        if len(toadd) == 729:
             break
         if tmp[i][0] >= X[len(toadd)][0]:
             toadd.append(tmp[i][1])
@@ -37,8 +39,7 @@ def mergeData(y_option=1): #1 is classify increase/decrease, 2 is regression of 
         Y = np.array([[X[i+1][1] / X[i][1] for i in range(len(X)-1)]]).T
         scalerY = StandardScaler()
         scalerY.fit(Y)
-        scalerY.transform(Y)
-        print(Y.shape)
+        Y = scalerY.transform(Y)
 
     feature_files = ['cost-per-transaction-percent.csv', 'estimated-transaction-volume-usd.csv',
                      'estimated-transaction-volume.csv', 'hash-rate.csv', 'market-cap.csv',
